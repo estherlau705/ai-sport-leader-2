@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迪卡儂 AI 遠足顧問</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #0082c3; color: #333; display: flex; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
+        h2 { color: #0082c3; text-align: center; margin-bottom: 25px; }
+        .question { margin-bottom: 20px; }
+        .options { display: flex; gap: 8px; flex-wrap: wrap; }
+        button { padding: 12px 18px; border: 2px solid #eee; border-radius: 25px; background: white; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        button.active { background: #0082c3; color: white; border-color: #0082c3; }
+        #submit-btn { width: 100%; background: #ffb400; color: #000; border: none; padding: 15px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        #result { margin-top: 25px; display: none; border-top: 2px solid #eee; pt: 20px; }
+        .price { font-size: 24px; color: #e4002b; font-weight: bold; margin: 10px 0; }
+        .feature-tag { display: inline-block; background: #eef9ff; padding: 5px 10px; border-radius: 5px; font-size: 12px; margin-right: 5px; color: #005682; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🏔️ AI 遠足顧問</h2>
+        <div id="quiz">
+            <div class="question">
+                <p><strong>1. 地形如何？</strong></p>
+                <div class="options" data-key="terrain">
+                    <button onclick="sel(this, 'rocky')">崎嶇岩石</button>
+                    <button onclick="sel(this, 'flat')">平坦小徑</button>
+                </div>
+            </div>
+            <div class="question">
+                <p><strong>2. 天氣預報？</strong></p>
+                <div class="options" data-key="weather">
+                    <button onclick="sel(this, 'rain')">可能下雨</button>
+                    <button onclick="sel(this, 'dry')">晴天/乾爽</button>
+                </div>
+            </div>
+            <div class="question">
+                <p><strong>3. 行程時長？</strong></p>
+                <div class="options" data-key="time">
+                    <button onclick="sel(this, 'long')">超過 3 小時</button>
+                    <button onclick="sel(this, 'short')">短途體驗</button>
+                </div>
+            </div>
+            <div class="question">
+                <p><strong>4. 偏好？</strong></p>
+                <div class="options" data-key="style">
+                    <button onclick="sel(this, 'mid')">保護腳踝 (中筒)</button>
+                    <button onclick="sel(this, 'low')">靈活輕便 (低筒)</button>
+                </div>
+            </div>
+            <button id="submit-btn" onclick="analyze()">獲取專業建議</button>
+        </div>
+
+        <div id="result">
+            <p style="color:#666; font-size:14px; margin-bottom:5px;">領隊推薦：</p>
+            <h3 id="res-name" style="margin:0;"></h3>
+            <div class="price" id="res-price"></div>
+            <div id="res-tags"></div>
+            <p id="res-reason" style="font-size:14px; line-height:1.5;"></p>
+            <button onclick="location.reload()" style="width:100%; background:#eee; border:none; margin-top:15px;">重新測試</button>
+        </div>
+    </div>
+
+    <script>
+        let config = {};
+        function sel(btn, val) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            config[parent.getAttribute('data-key')] = val;
+        }
+
+        function analyze() {
+            if(Object.keys(config).length < 4) return alert('請完成所有選擇！');
+            let res = {};
+            // 邏輯判斷對標數據表
+            if (config.terrain === 'rocky' || config.time === 'long') {
+                res = { name: "MH500 MID WTP", price: "$699", reason: "針對崎嶇地形及長途挑戰，提供 8 小時頂級防水與 5mm 深鞋釘抓地力。", tags: ["8H防水", "5mm鞋釘", "厚底避震"] };
+            } else if (config.weather === 'rain') {
+                res = { name: "MH100 MID WTP", price: "$449", reason: "提供基礎 3 小時防水與中筒腳踝支撐，適合短途雨天遠足。", tags: ["3H防水", "4mm鞋釘", "中筒保護"] };
+            } else {
+                res = { name: "FH500", price: "$499", reason: "適合晴天快速移動，輕量設計讓每一步都更靈活自如。", tags: ["非防水", "極佳抓地", "輕量化"] };
+            }
+            
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('res-name').innerText = res.name;
+            document.getElementById('res-price').innerText = res.price;
+            document.getElementById('res-reason').innerText = res.reason;
+            let tagHtml = '';
+            res.tags.forEach(t => tagHtml += `<span class="feature-tag">${t}</span>`);
+            document.getElementById('res-tags').innerHTML = tagHtml;
+        }
+    </script>
+</body>
+</html>
